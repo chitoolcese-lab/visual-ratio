@@ -1,3 +1,4 @@
+cat << 'EOF'
 name: Build VisualRatio
 
 on:
@@ -31,3 +32,23 @@ jobs:
         with:
           name: visualratio-1.19.2
           path: build/libs/*.jar
+
+      - name: Decompile GameRenderer for diagnosis
+        run: |
+          gradle genSources --stacktrace || true
+          echo "--- Buscando el jar de sources de minecraft ---"
+          find / -iname "*sources*.jar" 2>/dev/null | grep -i minecraft
+          SRC_JAR=$(find / -iname "*sources*.jar" 2>/dev/null | grep -i minecraft | head -n 1)
+          echo "Usando: $SRC_JAR"
+          mkdir -p /tmp/extracted
+          unzip -o "$SRC_JAR" "net/minecraft/client/render/GameRenderer.java" -d /tmp/extracted
+          echo "===== CONTENIDO DE GameRenderer.java ====="
+          cat /tmp/extracted/net/minecraft/client/render/GameRenderer.java
+
+      - name: Upload decompiled source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: decompiled-source
+          path: /tmp/extracted/**
+EOF
