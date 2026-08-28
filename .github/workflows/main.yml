@@ -10,45 +10,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.5'
-
-      - name: Build with Gradle
-        run: gradle build --stacktrace
-
-      - name: Upload built jar
-        uses: actions/upload-artifact@v4
+      - run: gradle build --stacktrace
+      - uses: actions/upload-artifact@v4
         with:
           name: visualratio-1.19.2
           path: build/libs/*.jar
-
-      - name: Decompile GameRenderer for diagnosis
-        run: |
-          gradle genSources --stacktrace || true
-          echo "--- Buscando el jar de sources de minecraft ---"
-          find / -iname "*sources*.jar" 2>/dev/null | grep -i minecraft
-          SRC_JAR=$(find / -iname "*sources*.jar" 2>/dev/null | grep -i minecraft | head -n 1)
-          echo "Usando: $SRC_JAR"
+      - run: gradle genSources --stacktrace || true
+      - run: find / -iname "*sources*.jar" 2>/dev/null | grep -i minecraft > /tmp/srcjar.txt; cat /tmp/srcjar.txt
+      - run: |
+          SRC_JAR=$(cat /tmp/srcjar.txt | head -n 1)
           mkdir -p /tmp/extracted
           unzip -o "$SRC_JAR" "net/minecraft/client/render/GameRenderer.java" -d /tmp/extracted
-          echo "===== CONTENIDO DE GameRenderer.java ====="
-          cat /tmp/extracted/net/minecraft/client/render/GameRenderer.java
-
-      - name: Upload decompiled source
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: decompiled-source
-          path: /tmp/extracted/**
+          path: /tmp/extracted
 EOF
