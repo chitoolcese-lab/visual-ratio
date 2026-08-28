@@ -1,4 +1,3 @@
-cat << 'EOF'
 name: Build VisualRatio
 
 on:
@@ -34,4 +33,3 @@ jobs:
         with:
           name: decompiled-source
           path: /tmp/extracted
-EOF
