@@ -10,7 +10,7 @@ import ru.matt.config.VisualRatioConfig;
 public abstract class MixinGameRenderer {
 
     @ModifyArg(
-            method = "getProjectionMatrix",
+            method = "getBasicProjectionMatrix",
             at = @At(
                     value = "INVOKE",
                     target = "Lorg/joml/Matrix4f;perspective(FFFF)Lorg/joml/Matrix4f;"
