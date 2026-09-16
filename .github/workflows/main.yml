@@ -20,7 +20,7 @@ jobs:
       - run: gradle build --stacktrace
       - uses: actions/upload-artifact@v4
         with:
-          name: visualratio-1.19.2
+          name: visualratio-1.19.4
           path: build/libs/*.jar
       - run: gradle genSources --stacktrace || true
       - run: find / -iname "*sources*.jar" 2>/dev/null | grep -i minecraft > /tmp/srcjar.txt; cat /tmp/srcjar.txt
